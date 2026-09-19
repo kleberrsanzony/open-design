@@ -113,6 +113,7 @@ describe("legacy payload desktop handoff", () => {
         confirmTimeoutMs: 100,
         spawn: spawn as never,
         now: () => new Date("2026-07-15T02:00:00.000Z"),
+        platform: "darwin",
         requestDesktop,
         sleep: async () => undefined,
         writeJsonFile: async (filePath, payload) => {
@@ -126,6 +127,7 @@ describe("legacy payload desktop handoff", () => {
 
       expect(spawn).toHaveBeenCalledWith(expect.objectContaining({
         command: value.payloadExecutablePath,
+        detached: true,
         resources: {
           dataRoot: join(value.root, "data"),
           ownerPid: null,

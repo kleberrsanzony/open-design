@@ -422,6 +422,7 @@ export async function executeLegacyPayloadDesktopHandoff(
     confirmTimeoutMs?: number;
     env?: NodeJS.ProcessEnv;
     now?: () => Date;
+    platform?: NodeJS.Platform;
     requestDesktop?: (message: "shutdown" | "status") => Promise<unknown>;
     sleep?: (durationMs: number) => Promise<unknown>;
     spawn?: typeof spawnSidecar;
@@ -495,6 +496,11 @@ export async function executeLegacyPayloadDesktopHandoff(
         args,
         command: prepared.descriptor.payloadExecutablePath,
         cwd: dirname(prepared.descriptor.payloadExecutablePath),
+        // The payload desktop must outlive the outer launcher. On macOS,
+        // launch it in a separate session so loginwindow does not treat the
+        // replacement desktop as a subordinate of the launcher that exits
+        // immediately after the handoff.
+        detached: (options.platform ?? process.platform) === "darwin",
         env: desktopProcessEnv(options.env ?? process.env, prepared.runtimeRoot),
         logFd: null,
         resources: {
